@@ -48,8 +48,14 @@ def handle_post(request):
                     # Handle optin
                     pass
                 elif messaging_event.get('message'):
-                    print messaging_event
-                    respond(messaging_event['sender']['id'], messaging_event['message'])
+                    message = messaging_event.get('message')
+                    text = message.get('text', '')
+                    attachments = message.get('attachments', [])
+
+                    if attachments and attachments[0]['type'] == 'image':
+                        print attachments[0]['payload']
+
+                    respond(messaging_event['sender']['id'], text)
                 elif messaging_event.get('delivery'):
                     # Handle message delivery
                     pass
@@ -69,7 +75,7 @@ def handle_post(request):
     return Response('', 200)
 
 
-def respond(recipient_id, message):
+def respond(recipient_id, text):
     requests.post('https://graph.facebook.com/v2.6/me/messages?access_token={access_token}'.format(
         access_token=MESSENGER_PAGE_ACCESS_TOKEN
     ), data=json.dumps({
@@ -77,7 +83,7 @@ def respond(recipient_id, message):
             'id': recipient_id,
         },
         'message': {
-            'text': message['text'],
+            'text': text,
             'metadata': 'DEVELOPER_DEFINED_METADATA'
         }
     }), headers={
