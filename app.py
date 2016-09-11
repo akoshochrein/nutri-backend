@@ -17,7 +17,7 @@ def healthcheck():
 
 @app.route('/webhook', methods=['POST', 'GET'])
 def webhook():
-    print request.args
+    print request.json
     if request.method == 'GET':
         return handle_get(request)
     elif request.method == 'POST':
