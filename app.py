@@ -4,7 +4,8 @@ app = Flask(__name__)
 VALIDATION_TOKEN = ''
 
 
-@app.route('/healthcheck'):
+@app.route('/healthcheck')
+def healthcheck():
     return Response('OK', 200)
 
 
