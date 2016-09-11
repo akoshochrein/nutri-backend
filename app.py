@@ -15,7 +15,7 @@ def healthcheck():
     return Response('OK', 200)
 
 
-@app.route('/webhook')
+@app.route('/webhook', methods=['POST', 'GET'])
 def webhook():
     print request.__dict__
     if request.method == 'GET':
