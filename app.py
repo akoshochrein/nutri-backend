@@ -72,7 +72,7 @@ def handle_post(request):
 
 
 def respond(recipient_id, message):
-    requests.post('https://graph.facebook.com/v2.6/me/messages?access_token={}'.format(
+    requests.post('https://graph.facebook.com/v2.6/me/messages?access_token={access_token}'.format(
         access_token=MESSENGER_PAGE_ACCESS_TOKEN
     ), data={
         'id': recipient_id,
