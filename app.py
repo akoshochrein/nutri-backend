@@ -4,6 +4,10 @@ app = Flask(__name__)
 VALIDATION_TOKEN = ''
 
 
+@app.route('/healthcheck'):
+    return Response('OK', 200)
+
+
 @app.route('/webhook')
 def webhook():
     if request.method == 'GET':
