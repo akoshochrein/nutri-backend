@@ -53,7 +53,7 @@ def handle_post(request):
                     attachments = message.get('attachments', [])
 
                     if attachments and attachments[0]['type'] == 'image':
-                        print attachments[0]['payload']
+                        text = attachments[0]['payload']['url']
 
                     respond(messaging_event['sender']['id'], text)
                 elif messaging_event.get('delivery'):
