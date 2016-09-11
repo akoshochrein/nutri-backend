@@ -1,5 +1,6 @@
 import os
 import sys
+import requests
 
 from flask import Flask, Response, request
 
@@ -40,8 +41,6 @@ def handle_get(request):
 
 def handle_post(request):
     data = request.form
-    print data
-    sys.stdout.flush()
 
     if 'page' == data['object']:
         for page_entry in data['entry']:
@@ -53,8 +52,7 @@ def handle_post(request):
                     # Handle optin
                     pass
                 elif messaging_event.get('message'):
-                    # Handle message
-                    pass
+                    respond(messaging_event['sender']['id'], messaging_event['message'])
                 elif messaging_event.get('delivery'):
                     # Handle message delivery
                     pass
@@ -72,3 +70,15 @@ def handle_post(request):
                     pass
 
     return Response('', 200)
+
+
+def respond(recipient_id, message):
+    requests.post('https://graph.facebook.com/v2.6/me/messages?access_token={}'.format(
+        access_token=MESSENGER_PAGE_ACCESS_TOKEN
+    ), data={
+        'id': recipient_id,
+        'message': {
+            'text': message,
+            'metadata': 'DEVELOPER_DEFINED_METADATA'
+        }
+    })
