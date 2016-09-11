@@ -3,6 +3,7 @@ from flask import Flask, Response, request
 app = Flask(__name__)
 
 VALIDATION_TOKEN = os.environ.get('FB_VALDIATION_TOKEN') or 'test'
+MESSENGER_PAGE_ACCESS_TOKEN = os.environ.get('MESSENGER_PAGE_ACCESS_TOKEN')
 
 
 @app.route('/healthcheck')
@@ -35,6 +36,7 @@ def handle_get(request):
 
 def handle_post(request):
     data = request.form
+    print data
 
     if 'page' == data['object']:
         for page_entry in data['entry']:
