@@ -1,6 +1,7 @@
+import json
 import os
-import sys
 import requests
+import sys
 
 from flask import Flask, Response, request
 
