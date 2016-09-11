@@ -48,7 +48,12 @@ def handle_post(request):
                     # Handle optin
                     pass
                 elif messaging_event.get('message'):
-                    respond(messaging_event['sender']['id'], messaging_event['message'])
+                    text = messaging_event['message']['text']
+
+                    if text == 'image':
+                        print messaging_event
+
+                    respond(messaging_event['sender']['id'], text)
                 elif messaging_event.get('delivery'):
                     # Handle message delivery
                     pass
