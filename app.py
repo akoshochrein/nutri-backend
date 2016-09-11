@@ -1,5 +1,8 @@
 import os
+import sys
+
 from flask import Flask, Response, request
+
 app = Flask(__name__)
 
 VALIDATION_TOKEN = os.environ.get('FB_VALDIATION_TOKEN') or 'test'
@@ -37,6 +40,8 @@ def handle_get(request):
 
 def handle_post(request):
     data = request.form
+    print data
+    sys.stdout.flush()
 
     if 'page' == data['object']:
         for page_entry in data['entry']:
