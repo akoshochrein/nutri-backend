@@ -1,7 +1,8 @@
-from flask import Flask, Response
+import os
+from flask import Flask, Response, request
 app = Flask(__name__)
 
-VALIDATION_TOKEN = ''
+VALIDATION_TOKEN = os.environ.get('FB_VALDIATION_TOKEN') or 'test'
 
 
 @app.route('/healthcheck')
