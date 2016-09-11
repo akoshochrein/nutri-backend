@@ -21,10 +21,6 @@ def webhook():
         return handle_get(request)
     elif request.method == 'POST':
         return handle_post(request)
-    else:
-        # Bad request
-        pass
-    return 'Hello, World!'
 
 
 def handle_get(request):
@@ -72,6 +68,7 @@ def handle_post(request):
 
 
 def respond(recipient_id, message):
+    print recipient_id, message
     requests.post('https://graph.facebook.com/v2.6/me/messages?access_token={access_token}'.format(
         access_token=MESSENGER_PAGE_ACCESS_TOKEN
     ), data={
