@@ -13,6 +13,7 @@ def healthcheck():
 
 @app.route('/webhook')
 def webhook():
+    print request.__dict__
     if request.method == 'GET':
         return handle_get(request)
     elif request.method == 'POST':
@@ -36,7 +37,6 @@ def handle_get(request):
 
 def handle_post(request):
     data = request.form
-    print data
 
     if 'page' == data['object']:
         for page_entry in data['entry']:
