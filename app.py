@@ -77,6 +77,9 @@ def handle_post(request):
                         text = attachments[0]['payload']['url']
                         if api_response.get('responses'):
                             descriptions = [annotation['description'] for annotation in api_response['responses'][0]['labelAnnotations']]
+
+                            # text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
+                            # if 'food' not in descriptions:
                             text = ', '.join(descriptions)
 
                     respond(messaging_event['sender']['id'], text)
@@ -100,6 +103,7 @@ def handle_post(request):
 
 
 def respond(recipient_id, text):
+    print recipient_id, text
     requests.post('https://graph.facebook.com/v2.6/me/messages?access_token={access_token}'.format(
         access_token=MESSENGER_PAGE_ACCESS_TOKEN
     ), data=json.dumps({
