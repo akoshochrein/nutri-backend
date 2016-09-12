@@ -1,7 +1,9 @@
+import base64
 import json
 import os
 import requests
 import sys
+import urllib
 
 from flask import Flask, Response, request
 
@@ -9,6 +11,9 @@ app = Flask(__name__)
 
 VALIDATION_TOKEN = os.environ.get('FB_VALDIATION_TOKEN') or 'test'
 MESSENGER_PAGE_ACCESS_TOKEN = os.environ.get('MESSENGER_PAGE_ACCESS_TOKEN')
+GOOGLE_VISION_DEVELOPER_KEY = os.environ.get('GOOGLE_VISION_DEVELOPER_KEY')
+
+gvision = build('vision', 'v1', developerKey=GOOGLE_VISION_DEVELOPER_KEY)
 
 
 @app.route('/healthcheck')
@@ -53,7 +58,24 @@ def handle_post(request):
                     attachments = message.get('attachments', [])
 
                     if attachments and attachments[0]['type'] == 'image':
+                        opener = urllib.urlopen(attachments[0]['payload']['url'])
+                        image_content = base64.b64encode(opener.read())
+                        request = gvision.images().annotate(body={
+                            'requests': [{
+                                'image': {
+                                    'content': image_content
+                                },
+                                'features': [{
+                                    'type': 'LABEL_DETECTION',
+                                    'maxResults': 4
+                                }]
+                            }]
+                        })
+                        api_response = request.execute()
+
                         text = attachments[0]['payload']['url']
+                        if api_response.get('responses'):
+                            text = api_response['responses'][0]['labelAnnotations'][0]['description']
 
                     respond(messaging_event['sender']['id'], text)
                 elif messaging_event.get('delivery'):
