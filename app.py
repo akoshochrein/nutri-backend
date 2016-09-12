@@ -76,7 +76,8 @@ def handle_post(request):
 
                         text = attachments[0]['payload']['url']
                         if api_response.get('responses'):
-                            text = api_response['responses'][0]['labelAnnotations'][0]['description']
+                            descriptions = [annotation['description'] for annotation in api_response['responses'][0]['labelAnnotations']]
+                            text = ', '.join(descriptions)
 
                     respond(messaging_event['sender']['id'], text)
                 elif messaging_event.get('delivery'):
