@@ -12,9 +12,9 @@ app = Flask(__name__)
 
 VALIDATION_TOKEN = os.environ.get('FB_VALDIATION_TOKEN') or 'test'
 MESSENGER_PAGE_ACCESS_TOKEN = os.environ.get('MESSENGER_PAGE_ACCESS_TOKEN')
-GOOGLE_VISION_DEVELOPER_KEY = os.environ.get('GOOGLE_VISION_DEVELOPER_KEY')
+GOOGLE_VISION_API_KEY = os.environ.get('GOOGLE_VISION_API_KEY')
 
-gvision = build('vision', 'v1', developerKey=GOOGLE_VISION_DEVELOPER_KEY)
+gvision = build('vision', 'v1', developerKey=GOOGLE_VISION_API_KEY)
 
 
 @app.route('/healthcheck')
