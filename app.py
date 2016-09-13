@@ -59,6 +59,8 @@ def handle_post(request):
                     text = message.get('text', '')
                     attachments = message.get('attachments', [])
 
+                    print text or 'no text'
+
                     if attachments and 'image' == attachments[0]['type']:
                         respond(messaging_event['sender']['id'], 'Checking what this is...')
 
