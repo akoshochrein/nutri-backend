@@ -88,21 +88,21 @@ def handle_post(request):
                                 text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
 
                     respond(messaging_event['sender']['id'], text)
-                 elif messaging_event.get('delivery'):
-                     # Handle message delivery
-                     pass
-                 elif messaging_event.get('postback'):
-                     # Handle postback
-                     pass
-                 elif messaging_event.get('read'):
-                     # Handle read
-                     pass
-                 elif messaging_event.get('account_linking'):
-                     # Handle account linking
-                     pass
-                 else:
-                     # Unknown message
-                     pass
+                elif messaging_event.get('delivery'):
+                    # Handle message delivery
+                    pass
+                elif messaging_event.get('postback'):
+                    # Handle postback
+                    pass
+                elif messaging_event.get('read'):
+                    # Handle read
+                    pass
+                elif messaging_event.get('account_linking'):
+                    # Handle account linking
+                    pass
+                else:
+                    # Unknown message
+                    pass
 
     return Response('', 200)
 
