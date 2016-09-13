@@ -7,6 +7,7 @@ import urllib
 
 from apiclient.discovery import build
 from flask import Flask, Response, request
+from wiki_scraper import get_nutrition_facts
 
 app = Flask(__name__)
 
@@ -58,7 +59,9 @@ def handle_post(request):
                     text = message.get('text', '')
                     attachments = message.get('attachments', [])
 
-                    if attachments and attachments[0]['type'] == 'image':
+                    if attachments and 'image' == attachments[0]['type']:
+                        respond(messaging_event['sender']['id'], 'Checking what this is...')
+
                         opener = urllib.urlopen(attachments[0]['payload']['url'])
                         image_content = base64.b64encode(opener.read())
                         request = gvision.images().annotate(body={
@@ -78,9 +81,10 @@ def handle_post(request):
                         if api_response.get('responses'):
                             descriptions = [annotation['description'] for annotation in api_response['responses'][0]['labelAnnotations']]
 
-                            # text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
-                            # if 'food' not in descriptions:
-                            text = ', '.join(descriptions)
+                            text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
+                            if 'food' in descriptions:
+                                nutrition_facts = get_nutrition_facts(descriptions[0])
+                                text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts)
 
                     respond(messaging_event['sender']['id'], text)
                 elif messaging_event.get('delivery'):
