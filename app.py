@@ -58,10 +58,6 @@ def handle_post(request):
                     text = message.get('text', '')
                     attachments = message.get('attachments', [])
 
-                    print message
-                    print text
-                    print attachments
-
                     if attachments and 'image' == attachments[0]['type']:
                         respond(messaging_event['sender']['id'], 'Checking what this is...')
 
@@ -84,12 +80,23 @@ def handle_post(request):
                         if api_response.get('responses'):
                             descriptions = [annotation['description'] for annotation in api_response['responses'][0]['labelAnnotations']]
 
+                            guessed_food_name = ''
                             text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
                             if 'food' in descriptions:
                                 nutrition_facts = []
-                                nutrition_facts += [get_nutrition_facts(description) for description in descriptions]
-                                nutrition_facts = sum(nutrition_facts, [])
+                                for description in descriptions:
+                                    nutriction_fact = get_nutrition_facts(description)
+                                    if nutrition_fact:
+                                        nutrition_facts += nutriction_fact
+                                        guessed_food_name = description
+
                                 text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
+
+                            if text:
+                                text = 'This, my friend, is a {guessed_food_name}\n'.format(guessed_food_name=guessed_food_name) + text
+
+                            else:
+                                text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
 
                     respond(messaging_event['sender']['id'], text)
                 elif messaging_event.get('delivery'):
