@@ -45,16 +45,15 @@ def handle_get(request):
 def handle_post(request):
     data = request.json
 
+    print 'in post'
+
     if 'page' == data['object']:
         for page_entry in data['entry']:
             page_id = page_entry['id']
             timestamp = page_entry['time']
 
             for messaging_event in page_entry['messaging']:
-                if messaging_event.get('optin'):
-                    # Handle optin
-                    pass
-                elif messaging_event.get('message'):
+                if messaging_event.get('message'):
                     message = messaging_event.get('message')
                     text = message.get('text', '')
                     attachments = message.get('attachments', [])
@@ -89,21 +88,6 @@ def handle_post(request):
                                 text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts)
 
                     respond(messaging_event['sender']['id'], text)
-                elif messaging_event.get('delivery'):
-                    # Handle message delivery
-                    pass
-                elif messaging_event.get('postback'):
-                    # Handle postback
-                    pass
-                elif messaging_event.get('read'):
-                    # Handle read
-                    pass
-                elif messaging_event.get('account_linking'):
-                    # Handle account linking
-                    pass
-                else:
-                    # Unknown message
-                    pass
 
     return Response('', 200)
 
