@@ -85,9 +85,9 @@ def handle_post(request):
                             if 'food' in descriptions:
                                 nutrition_facts = []
                                 for description in descriptions:
-                                    nutriction_fact = get_nutrition_facts(description)
+                                    nutrition_fact = get_nutrition_facts(description)
                                     if nutrition_fact:
-                                        nutrition_facts += nutriction_fact
+                                        nutrition_facts += nutrition_fact
                                         guessed_food_name = description
 
                                 text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
