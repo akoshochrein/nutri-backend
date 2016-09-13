@@ -93,7 +93,10 @@ def handle_post(request):
                                 text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
 
                             if text:
-                                text = 'This, my friend, is a {guessed_food_name}\n'.format(guessed_food_name=guessed_food_name) + text
+                                text = 'This, my friend, is {article} {guessed_food_name}\n'.format(
+                                    article='an' if guessed_food_name[0].lower() in 'aeiou' else 'a'
+                                    guessed_food_name=guessed_food_name
+                                ) + text
                             else:
                                 text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
 
