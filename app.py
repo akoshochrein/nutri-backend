@@ -94,7 +94,7 @@ def handle_post(request):
 
                             if text:
                                 text = 'This, my friend, is {article} {guessed_food_name}\n'.format(
-                                    article='an' if guessed_food_name[0].lower() in 'aeiou' else 'a'
+                                    article='an' if guessed_food_name[0].lower() in 'aeiou' else 'a',
                                     guessed_food_name=guessed_food_name
                                 ) + text
                             else:
