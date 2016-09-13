@@ -91,14 +91,13 @@ def handle_post(request):
                                         guessed_food_name = description
 
                                 text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
-
-                            if text and guessed_food_name:
-                                text = 'This, my friend, is {article} {guessed_food_name}\n'.format(
-                                    article='an' if guessed_food_name[0].lower() in 'aeiou' else 'a',
-                                    guessed_food_name=guessed_food_name
-                                ) + text
-                            else:
-                                text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
+                                if text and guessed_food_name:
+                                    text = 'This, my friend, is {article} {guessed_food_name}\n'.format(
+                                        article='an' if guessed_food_name[0].lower() in 'aeiou' else 'a',
+                                        guessed_food_name=guessed_food_name
+                                    ) + text
+                                else:
+                                    text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
 
                     respond(messaging_event['sender']['id'], text)
                 elif messaging_event.get('delivery'):
