@@ -94,7 +94,6 @@ def handle_post(request):
 
                             if text:
                                 text = 'This, my friend, is a {guessed_food_name}\n'.format(guessed_food_name=guessed_food_name) + text
-
                             else:
                                 text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
 
