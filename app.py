@@ -45,8 +45,6 @@ def handle_get(request):
 def handle_post(request):
     data = request.json
 
-    print 'in post'
-
     if 'page' == data['object']:
         for page_entry in data['entry']:
             page_id = page_entry['id']
@@ -57,8 +55,6 @@ def handle_post(request):
                     message = messaging_event.get('message')
                     text = message.get('text', '')
                     attachments = message.get('attachments', [])
-
-                    print text or 'no text'
 
                     if attachments and 'image' == attachments[0]['type']:
                         respond(messaging_event['sender']['id'], 'Checking what this is...')
@@ -84,6 +80,7 @@ def handle_post(request):
 
                             text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
                             if 'food' in descriptions:
+                                print descriptions
                                 nutrition_facts = get_nutrition_facts(descriptions[0])
                                 text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts)
 
