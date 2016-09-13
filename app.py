@@ -83,7 +83,7 @@ def handle_post(request):
                                 nutrition_facts = []
                                 nutrition_facts += [get_nutrition_facts(description) for description in descriptions]
                                 nutrition_facts = sum(nutrition_facts, [])
-                                text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts)
+                                text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
 
                     respond(messaging_event['sender']['id'], text)
 
