@@ -79,6 +79,9 @@ def handle_post(request):
                         text = attachments[0]['payload']['url']
                         if api_response.get('responses'):
                             descriptions = [annotation['description'] for annotation in api_response['responses'][0]['labelAnnotations']]
+                            print 'google_vision_api_responses {descriptions}'.format(
+                                descriptions=descriptions
+                            )
 
                             guessed_food_name = ''
                             text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
