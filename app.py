@@ -81,7 +81,8 @@ def handle_post(request):
                             text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
                             if 'food' in descriptions:
                                 print descriptions
-                                nutrition_facts = get_nutrition_facts(descriptions[0])
+                                nutrition_facts = []
+                                nutrition_facts += [get_nutrition_facts(description) for description in descriptions]
                                 text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts)
 
                     respond(messaging_event['sender']['id'], text)
