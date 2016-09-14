@@ -70,7 +70,7 @@ def handle_post(request):
                                 },
                                 'features': [{
                                     'type': 'LABEL_DETECTION',
-                                    'maxResults': 4
+                                    'maxResults': 8
                                 }]
                             }]
                         })
