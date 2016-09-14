@@ -4,8 +4,12 @@ from bs4 import BeautifulSoup
 ALLOWED_NUTRITION_KEYS = ['energy', 'carbohydrates', 'fat', 'protein']
 
 
+def get_wikipedia_url(item):
+    return 'https://en.wikipedia.org/wiki/{item}'.format(item=item.capitalize())
+
+
 def get_nutrition_facts(item):
-    response = requests.get('https://en.wikipedia.org/wiki/{item}'.format(item=item.capitalize()))
+    response = requests.get(get_wikipedia_url(item))
     soup = BeautifulSoup(response.content, 'html.parser')
 
     nutrition_facts = []

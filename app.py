@@ -7,7 +7,7 @@ import urllib
 
 from apiclient.discovery import build
 from flask import Flask, Response, request
-from wiki_scraper import get_nutrition_facts
+from wiki_scraper import get_nutrition_facts, get_wikipedia_url
 
 app = Flask(__name__)
 
@@ -57,6 +57,7 @@ def handle_post(request):
                     message = messaging_event.get('message')
                     text = message.get('text', '')
                     attachments = message.get('attachments', [])
+                    buttons = None
 
                     if attachments and 'image' == attachments[0]['type']:
                         respond(messaging_event['sender']['id'], 'Checking what this is...')
@@ -95,14 +96,19 @@ def handle_post(request):
 
                                 text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
                                 if text and guessed_food_name:
-                                    text = 'This, my friend, is {article} {guessed_food_name}\n'.format(
+                                    text = 'This looks like {article} {guessed_food_name} to me. Here are the facts I could gather:\n'.format(
                                         article='an' if guessed_food_name[0].lower() in 'aeiou' else 'a',
                                         guessed_food_name=guessed_food_name
                                     ) + text
+                                    buttons = [{
+                                        'type': 'web_url',
+                                        'url': get_wikipedia_url(guessed_food_name),
+                                        'title': 'More info'
+                                    }]
                                 else:
                                     text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
 
-                    respond(messaging_event['sender']['id'], text)
+                    respond(messaging_event['sender']['id'], text, buttons=buttons)
                 elif messaging_event.get('delivery'):
                     # Handle message delivery
                     pass
@@ -122,18 +128,36 @@ def handle_post(request):
     return Response('', 200)
 
 
-def respond(recipient_id, text):
+def respond(recipient_id, text, buttons=None):
     print recipient_id, text
-    requests.post('https://graph.facebook.com/v2.6/me/messages?access_token={access_token}'.format(
-        access_token=MESSENGER_PAGE_ACCESS_TOKEN
-    ), data=json.dumps({
+
+    payload = {
         'recipient': {
             'id': recipient_id,
-        },
-        'message': {
-            'text': text,
-            'metadata': 'DEVELOPER_DEFINED_METADATA'
         }
-    }), headers={
+    }
+    if buttons:
+        payload.update({
+            'message': {
+                'attachment': {
+                    'type': 'template',
+                    'payload': {
+                        'template_type': 'button',
+                        'text': text,
+                        'buttons': buttons
+                    }
+                }
+            }
+        })
+    else:
+        payload.update({
+            'message': {
+                'text': text,
+            }
+        })
+
+    requests.post('https://graph.facebook.com/v2.6/me/messages?access_token={access_token}'.format(
+        access_token=MESSENGER_PAGE_ACCESS_TOKEN
+    ), data=json.dumps(payload), headers={
         'content-type': 'application/json'
     })
