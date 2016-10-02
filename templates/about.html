@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block css %}
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/general.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h1>About</h1>
+
+    <h2>What is Nutri?</h2>
+    <p>
+        Nutri is a chat bot that tries to help you with nutrition facts about the fruits and vegetables that you are unsure of. Be aware, that <span class="highlight">Nutri is not always correct. And is never 100% sure about the guessed food.</span>
+    </p>
+
+    <h2>What does Nutri know about you?</h2>
+    <p>
+        It might seem like that Nutri knows a lot of things about your nutritient facts and uses this for evil doings in a science lab, however, <span class="highlight">Nutri does not store any of your private data, including your email address.</span>
+    </p>
+
+    <h2>Who to contact with any questions?</h2>
+    <p>
+        That would be the creator of Nutri, <a href="https://github.com/akoskaaa" target="_blank">Akos Hochrein</a>.
+    </p>
+{% endblock %}
