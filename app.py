@@ -6,7 +6,7 @@ import sys
 import urllib
 
 from apiclient.discovery import build
-from flask import Flask, Response, request
+from flask import Flask, Response, render_template, request
 from wiki_scraper import get_nutrition_facts, get_wikipedia_url
 
 app = Flask(__name__)
@@ -21,6 +21,11 @@ gvision = build('vision', 'v1', developerKey=GOOGLE_VISION_API_KEY)
 @app.route('/healthcheck')
 def healthcheck():
     return Response('OK', 200)
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 
 @app.route('/webhook', methods=['POST', 'GET'])
