@@ -59,6 +59,7 @@ def handle_post(request):
                 if messaging_event.get('optin'):
                     pass
                 elif messaging_event.get('message'):
+                    print messaging_event, messaging_event.get('message')
                     message = messaging_event.get('message')
                     text = message.get('text', '')
                     attachments = message.get('attachments', [])
