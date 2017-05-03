@@ -99,6 +99,7 @@ def handle_post(request):
                                     if nutrition_fact:
                                         nutrition_facts += nutrition_fact
                                         guessed_food_name = description
+                                        break
 
                                 text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
                                 if text and guessed_food_name:
