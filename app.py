@@ -7,7 +7,7 @@ import urllib
 
 from apiclient.discovery import build
 from flask import Flask, Response, render_template, request
-from wiki_scraper import get_nutrition_facts, get_wikipedia_url
+from wiki_scraper import get_nutrition_facts_from_wiki, get_wikipedia_url
 
 app = Flask(__name__)
 
@@ -67,30 +67,11 @@ def handle_post(gvision_request):
                         buttons = None
 
                         descriptions = get_google_image_descriptions(attachments)
-                        guessed_food_name = ''
                         text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
                         if 'food' in descriptions:
-                            nutrition_facts = []
-                            for description in descriptions:
-                                nutrition_fact = get_nutrition_facts(description)
-                                if nutrition_fact:
-                                    nutrition_facts += nutrition_fact
-                                    guessed_food_name = description
-                                    break
-
-                            text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
-                            if text and guessed_food_name:
-                                text = 'This looks like {article} {guessed_food_name} to me. Here are the facts I could gather:\n'.format(
-                                    article='an' if guessed_food_name[0].lower() in 'aeiou' else 'a',
-                                    guessed_food_name=guessed_food_name
-                                ) + text
-                                buttons = [{
-                                    'type': 'web_url',
-                                    'url': get_wikipedia_url(guessed_food_name),
-                                    'title': 'More info'
-                                }]
-                            else:
-                                text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
+                            guessed_food_name, nutrition_facts = get_nutrition_facts(descriptions)
+                            text = build_response_text(guessed_food_name, nutrition_facts)
+                            buttons = build_response_buttons(buttons, guessed_food_name, text)
 
                         respond(sender_id, text, buttons=buttons)
                 elif messaging_event.get('delivery'):
@@ -110,6 +91,37 @@ def handle_post(gvision_request):
                     pass
 
     return Response('', 200)
+
+
+def build_response_buttons(buttons, guessed_food_name, text):
+    if text and guessed_food_name:
+        buttons = [{
+            'type': 'web_url',
+            'url': get_wikipedia_url(guessed_food_name),
+            'title': 'More info'
+        }]
+    return buttons
+
+
+def build_response_text(guessed_food_name, nutrition_facts):
+    text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
+    if text and guessed_food_name:
+        text = 'This looks like {article} {guessed_food_name} to me. Here are the facts I could gather:\n'.format(
+            article='an' if guessed_food_name[0].lower() in 'aeiou' else 'a',
+            guessed_food_name=guessed_food_name
+        ) + text
+    else:
+        text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
+    return text
+
+
+def get_nutrition_facts(descriptions):
+    nutrition_facts = []
+    for description in descriptions:
+        nutrition_fact = get_nutrition_facts_from_wiki(description)
+        if nutrition_fact:
+            nutrition_facts += nutrition_fact
+            return description, nutrition_facts
 
 
 def get_google_image_descriptions(attachments):

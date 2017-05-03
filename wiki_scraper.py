@@ -8,7 +8,7 @@ def get_wikipedia_url(item):
     return 'https://en.wikipedia.org/wiki/{item}'.format(item=item.capitalize())
 
 
-def get_nutrition_facts(item):
+def get_nutrition_facts_from_wiki(item):
     response = requests.get(get_wikipedia_url(item))
     soup = BeautifulSoup(response.content, 'html.parser')
 
