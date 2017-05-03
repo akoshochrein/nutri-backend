@@ -136,8 +136,6 @@ def handle_post(request):
 
 
 def respond(recipient_id, text, buttons=None):
-    print recipient_id, text
-
     payload = {
         'recipient': {
             'id': recipient_id,
