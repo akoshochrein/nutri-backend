@@ -52,21 +52,19 @@ def handle_post(request):
 
     if 'page' == data['object']:
         for page_entry in data['entry']:
-            page_id = page_entry['id']
-            timestamp = page_entry['time']
-
             for messaging_event in page_entry['messaging']:
                 if messaging_event.get('optin'):
                     pass
                 elif messaging_event.get('message'):
                     print messaging_event, messaging_event.get('message')
                     message = messaging_event.get('message')
-                    text = message.get('text', '')
                     attachments = message.get('attachments', [])
                     buttons = None
 
                     if attachments and 'image' == attachments[0]['type']:
-                        respond(messaging_event['sender']['id'], 'Checking what this is...')
+                        sender_id = messaging_event['sender']['id']
+                        respond(sender_id, 'Checking what this is...')
+                        set_typing(sender_id)
 
                         opener = urllib.urlopen(attachments[0]['payload']['url'])
                         image_content = base64.b64encode(opener.read())
@@ -115,7 +113,7 @@ def handle_post(request):
                                 else:
                                     text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
 
-                    respond(messaging_event['sender']['id'], text, buttons=buttons)
+                        respond(sender_id, text, buttons=buttons)
                 elif messaging_event.get('delivery'):
                     # Handle message delivery
                     pass
@@ -164,5 +162,18 @@ def respond(recipient_id, text, buttons=None):
     requests.post('https://graph.facebook.com/v2.6/me/messages?access_token={access_token}'.format(
         access_token=MESSENGER_PAGE_ACCESS_TOKEN
     ), data=json.dumps(payload), headers={
+        'content-type': 'application/json'
+    })
+
+
+def set_typing(recipient_id):
+    requests.post('https://graph.facebook.com/v2.6/me/messages?access_token={access_token}'.format(
+        access_token=MESSENGER_PAGE_ACCESS_TOKEN
+    ), data=json.dumps({
+        'recipient': {
+            'id': recipient_id
+        },
+        'sender_action': 'typing_on'
+    }), headers={
         'content-type': 'application/json'
     })
