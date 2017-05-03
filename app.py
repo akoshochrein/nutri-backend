@@ -122,6 +122,7 @@ def get_nutrition_facts(descriptions):
         if nutrition_fact:
             nutrition_facts += nutrition_fact
             return description, nutrition_facts
+    return None, None
 
 
 def get_google_image_descriptions(attachments):
