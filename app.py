@@ -47,8 +47,8 @@ def handle_get(request):
     return response
 
 
-def handle_post(request):
-    data = request.json
+def handle_post(gvision_request):
+    data = gvision_request.json
 
     if 'page' == data['object']:
         for page_entry in data['entry']:
@@ -59,59 +59,38 @@ def handle_post(request):
                     print messaging_event, messaging_event.get('message')
                     message = messaging_event.get('message')
                     attachments = message.get('attachments', [])
-                    buttons = None
 
                     if attachments and 'image' == attachments[0]['type']:
                         sender_id = messaging_event['sender']['id']
                         respond(sender_id, 'Checking what this is...')
                         set_typing(sender_id)
+                        buttons = None
 
-                        opener = urllib.urlopen(attachments[0]['payload']['url'])
-                        image_content = base64.b64encode(opener.read())
-                        request = gvision.images().annotate(body={
-                            'requests': [{
-                                'image': {
-                                    'content': image_content
-                                },
-                                'features': [{
-                                    'type': 'LABEL_DETECTION',
-                                    'maxResults': 8
+                        descriptions = get_google_image_descriptions(attachments)
+                        guessed_food_name = ''
+                        text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
+                        if 'food' in descriptions:
+                            nutrition_facts = []
+                            for description in descriptions:
+                                nutrition_fact = get_nutrition_facts(description)
+                                if nutrition_fact:
+                                    nutrition_facts += nutrition_fact
+                                    guessed_food_name = description
+                                    break
+
+                            text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
+                            if text and guessed_food_name:
+                                text = 'This looks like {article} {guessed_food_name} to me. Here are the facts I could gather:\n'.format(
+                                    article='an' if guessed_food_name[0].lower() in 'aeiou' else 'a',
+                                    guessed_food_name=guessed_food_name
+                                ) + text
+                                buttons = [{
+                                    'type': 'web_url',
+                                    'url': get_wikipedia_url(guessed_food_name),
+                                    'title': 'More info'
                                 }]
-                            }]
-                        })
-                        api_response = request.execute()
-
-                        text = attachments[0]['payload']['url']
-                        if api_response.get('responses'):
-                            descriptions = [annotation['description'] for annotation in api_response['responses'][0]['labelAnnotations']]
-                            print 'google_vision_api_responses {descriptions}'.format(
-                                descriptions=descriptions
-                            )
-
-                            guessed_food_name = ''
-                            text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
-                            if 'food' in descriptions:
-                                nutrition_facts = []
-                                for description in descriptions:
-                                    nutrition_fact = get_nutrition_facts(description)
-                                    if nutrition_fact:
-                                        nutrition_facts += nutrition_fact
-                                        guessed_food_name = description
-                                        break
-
-                                text = '\n'.join(' '.join(nutrition_fact) for nutrition_fact in nutrition_facts).encode('utf-8')
-                                if text and guessed_food_name:
-                                    text = 'This looks like {article} {guessed_food_name} to me. Here are the facts I could gather:\n'.format(
-                                        article='an' if guessed_food_name[0].lower() in 'aeiou' else 'a',
-                                        guessed_food_name=guessed_food_name
-                                    ) + text
-                                    buttons = [{
-                                        'type': 'web_url',
-                                        'url': get_wikipedia_url(guessed_food_name),
-                                        'title': 'More info'
-                                    }]
-                                else:
-                                    text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
+                            else:
+                                text = 'Even though it looks like food. I couldn\'t find anything useful on it.'
 
                         respond(sender_id, text, buttons=buttons)
                 elif messaging_event.get('delivery'):
@@ -131,6 +110,30 @@ def handle_post(request):
                     pass
 
     return Response('', 200)
+
+
+def get_google_image_descriptions(attachments):
+    opener = urllib.urlopen(attachments[0]['payload']['url'])
+    image_content = base64.b64encode(opener.read())
+    gvision_request = gvision.images().annotate(body={
+        'requests': [{
+            'image': {
+                'content': image_content
+            },
+            'features': [{
+                'type': 'LABEL_DETECTION',
+                'maxResults': 8
+            }]
+        }]
+    })
+    api_response = gvision_request.execute()
+    descriptions = []
+    if api_response.get('responses'):
+        descriptions = [annotation['description'] for annotation in api_response['responses'][0]['labelAnnotations']]
+        print 'google_vision_api_responses {descriptions}'.format(
+            descriptions=descriptions
+        )
+    return descriptions
 
 
 def respond(recipient_id, text, buttons=None):
