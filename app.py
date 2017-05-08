@@ -2,10 +2,10 @@ import base64
 import json
 import os
 import requests
-import sys
 import urllib
 
 from apiclient.discovery import build
+from messenger import Bot
 from flask import Flask, Response, render_template, request
 from wiki_scraper import get_nutrition_facts_from_wiki, get_wikipedia_url
 
@@ -16,6 +16,32 @@ MESSENGER_PAGE_ACCESS_TOKEN = os.environ.get('MESSENGER_PAGE_ACCESS_TOKEN')
 GOOGLE_VISION_API_KEY = os.environ.get('GOOGLE_VISION_API_KEY')
 
 gvision = build('vision', 'v1', developerKey=GOOGLE_VISION_API_KEY)
+
+
+class Nutri(Bot):
+
+    def handle_message(self, messaging_event):
+        print messaging_event, messaging_event.get('message')
+        message = messaging_event.get('message')
+        attachments = message.get('attachments', [])
+
+        if attachments and 'image' == attachments[0]['type']:
+            sender_id = messaging_event['sender']['id']
+            respond(sender_id, 'Checking what this is...')
+            set_typing(sender_id)
+            buttons = None
+
+            descriptions = get_google_image_descriptions(attachments)
+            text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
+            if 'food' in descriptions:
+                guessed_food_name, nutrition_facts = get_nutrition_facts(descriptions)
+                text = build_response_text(guessed_food_name, nutrition_facts)
+                buttons = build_response_buttons(buttons, guessed_food_name, text)
+
+            respond(sender_id, text, buttons=buttons)
+
+
+nutri = Nutri(VALIDATION_TOKEN, MESSENGER_PAGE_ACCESS_TOKEN)
 
 
 @app.route('/healthcheck')
@@ -47,49 +73,9 @@ def handle_get(request):
     return response
 
 
-def handle_post(gvision_request):
-    data = gvision_request.json
-
-    if 'page' == data['object']:
-        for page_entry in data['entry']:
-            for messaging_event in page_entry['messaging']:
-                if messaging_event.get('optin'):
-                    pass
-                elif messaging_event.get('message'):
-                    print messaging_event, messaging_event.get('message')
-                    message = messaging_event.get('message')
-                    attachments = message.get('attachments', [])
-
-                    if attachments and 'image' == attachments[0]['type']:
-                        sender_id = messaging_event['sender']['id']
-                        respond(sender_id, 'Checking what this is...')
-                        set_typing(sender_id)
-                        buttons = None
-
-                        descriptions = get_google_image_descriptions(attachments)
-                        text = 'I think you cannot eat that. Maybe show it to me from a different angle.'
-                        if 'food' in descriptions:
-                            guessed_food_name, nutrition_facts = get_nutrition_facts(descriptions)
-                            text = build_response_text(guessed_food_name, nutrition_facts)
-                            buttons = build_response_buttons(buttons, guessed_food_name, text)
-
-                        respond(sender_id, text, buttons=buttons)
-                elif messaging_event.get('delivery'):
-                    # Handle message delivery
-                    pass
-                elif messaging_event.get('postback'):
-                    # Handle postback
-                    pass
-                elif messaging_event.get('read'):
-                    # Handle read
-                    pass
-                elif messaging_event.get('account_linking'):
-                    # Handle account linking
-                    pass
-                else:
-                    # Unknown message
-                    pass
-
+def handle_post(request):
+    data = request.json
+    nutri.process_message(data)
     return Response('', 200)
 
 

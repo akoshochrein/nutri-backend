@@ -1,3 +1,4 @@
+appdirs==1.4.0
 attrs==16.1.0
 beautifulsoup4==4.5.1
 cffi==1.8.2
@@ -16,12 +17,15 @@ Jinja2==2.8
 lxml==3.6.4
 MarkupSafe==0.23
 oauth2client==3.0.0
+packaging==16.8
 parsel==1.0.3
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
 pycparser==2.14
 PyDispatcher==2.0.5
 pyOpenSSL==16.1.0
+pyparsing==2.1.10
+python-messenger==0.1.2
 queuelib==1.4.2
 requests==2.11.1
 rsa==3.4.2
